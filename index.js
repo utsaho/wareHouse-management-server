@@ -17,8 +17,6 @@ async function run() {
         const userCollection = client.db("bookHouse").collection("users");
         app.get('/test', async (req, res) => {
             const query = {};
-            // const query = { name: 'utsho' };
-
             const cursor = userCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
