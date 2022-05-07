@@ -29,12 +29,14 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+
         app.post('/book', async (req, res) => {
             const { id } = req.body;
             const query = { _id: ObjectId(id) };
             const book = await bookCollection.findOne(query);
             res.send(book);
         });
+
         app.post('/additems', async (req, res) => {
             const book = req.body;
             const result = await bookCollection.insertOne(book);
