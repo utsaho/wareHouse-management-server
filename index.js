@@ -29,8 +29,6 @@ async function run() {
             const page = parseInt(req.query.page);
             const email = req.query.email;
 
-            // console.log(email);
-
             let query = {};
             let cursor = bookCollection.find(query);
             let result;
@@ -40,7 +38,6 @@ async function run() {
             }
             if (size && !page) {
                 result = await cursor.limit(size).toArray();
-                // console.log(size);
             }
             else if (size && page) {
                 result = await cursor.skip(page * size).limit(size).toArray();
@@ -90,6 +87,13 @@ async function run() {
                 result = await bookCollection.estimatedDocumentCount();
             }
             res.json(result);
+        });
+
+        app.delete('/book/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await bookCollection.deleteOne(query);
+            res.send(result);
         });
     }
     finally {
