@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
+const { query } = require('express');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -24,9 +25,29 @@ async function run() {
         });
 
         app.get('/books', async (req, res) => {
-            const query = {};
-            const cursor = bookCollection.find(query);
-            const result = await cursor.toArray();
+            const size = parseInt(req.query.size);
+            const page = parseInt(req.query.page);
+            const email = req.query.email;
+
+            // console.log(email);
+
+            let query = {};
+            let cursor = bookCollection.find(query);
+            let result;
+            if (email) {
+                query = { email: email };
+                cursor = bookCollection.find(query);
+            }
+            if (size && !page) {
+                result = await cursor.limit(size).toArray();
+                // console.log(size);
+            }
+            else if (size && page) {
+                result = await cursor.skip(page * size).limit(size).toArray();
+            }
+            else {
+                result = await cursor.toArray();
+            }
             res.send(result);
         })
 
@@ -42,6 +63,28 @@ async function run() {
             const result = await bookCollection.insertOne(book);
             res.send(result);
         });
+
+        app.get('/totalBooks', async (req, res) => {
+            const email = req.query.email;
+            let query = {}
+            let result;
+            if (email) {
+                // console.log('your email: ', email);
+                const query = { email: email };
+                result = await bookCollection.countDocuments(query);
+            }
+            else {
+                result = await bookCollection.estimatedDocumentCount();
+            }
+            res.json(result);
+        });
+        // app.post('/myItems', async (req, res) => {
+        //     const email = req.body.email;
+        //     const query = { email: email };
+        //     const cursor = bookCollection.find(query);
+        //     const result = await cursor.toArray();
+        //     res.send(result);
+        // });
     }
     finally {
 
