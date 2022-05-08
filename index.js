@@ -17,10 +17,18 @@ async function run() {
         await client.connect();
         const userCollection = client.db("bookHouse").collection("users");
         const bookCollection = client.db("bookHouse").collection("books");
+        const requestCollection = client.db("bookHouse").collection("request");
+        const adviceCollection = client.db("bookHouse").collection("advice");
         app.get('/test', async (req, res) => {
             const query = {};
             const cursor = userCollection.find(query);
             const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        app.post('/request', async (req, res) => {
+            const request = req.body;
+            const result = await requestCollection.insertOne(request);
             res.send(result);
         });
 
@@ -54,6 +62,14 @@ async function run() {
             const book = await bookCollection.findOne(query);
             res.send(book);
         });
+
+        app.get('/advice', async (req, res) => {
+            const query = {};
+            const cursor = adviceCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
 
         app.put('/book/:id', async (req, res) => {
             const id = req.params.id;
