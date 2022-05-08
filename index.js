@@ -20,9 +20,16 @@ async function run() {
         const requestCollection = client.db("bookHouse").collection("request");
         const adviceCollection = client.db("bookHouse").collection("advice");
         const qnaCollection = client.db("bookHouse").collection("qna");
+        const bannerCollection = client.db("bookHouse").collection("banner");
         app.get('/test', async (req, res) => {
             const query = {};
             const cursor = userCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+        app.get('/banner', async (req, res) => {
+            const query = {};
+            const cursor = bannerCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
         });
