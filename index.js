@@ -51,11 +51,25 @@ async function run() {
             res.send(result);
         })
 
-        app.post('/book', async (req, res) => {
-            const { id } = req.body;
+        app.get('/book/:id', async (req, res) => {
+            const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const book = await bookCollection.findOne(query);
             res.send(book);
+        });
+
+        app.put('/book/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateBook = req.body;
+            const filter = { _id: ObjectId(id) };
+            const option = { upsert: true };
+            const doc = {
+                $set: {
+                    quantity: updateBook.quantity
+                }
+            }
+            const result = await bookCollection.updateOne(filter, doc, option);
+            res.send(result);
         });
 
         app.post('/additems', async (req, res) => {
@@ -69,7 +83,6 @@ async function run() {
             let query = {}
             let result;
             if (email) {
-                // console.log('your email: ', email);
                 const query = { email: email };
                 result = await bookCollection.countDocuments(query);
             }
@@ -78,13 +91,6 @@ async function run() {
             }
             res.json(result);
         });
-        // app.post('/myItems', async (req, res) => {
-        //     const email = req.body.email;
-        //     const query = { email: email };
-        //     const cursor = bookCollection.find(query);
-        //     const result = await cursor.toArray();
-        //     res.send(result);
-        // });
     }
     finally {
 
